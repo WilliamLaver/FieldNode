@@ -4,6 +4,7 @@ class ChessPiece(object):
     def __init__(self, colour):
         self.colour = colour
         self.type = None
+        self.location = None
     
     def get_colour(self):
         return self.colour
