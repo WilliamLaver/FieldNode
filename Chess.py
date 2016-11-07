@@ -32,5 +32,5 @@ class Chess(object):
 
 if __name__ == '__main__':
     myChess = Chess()
-
+    
     
