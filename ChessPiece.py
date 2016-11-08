@@ -15,9 +15,13 @@ class ChessPiece(object):
         
     def get_moves(self):
         return self.moves
+        
+    def move(self, destination):
+        self.location = destination
     
     def __str__(self):
         return self.colour + " " + self.type + " at " + str(self.location)
+        
 
 class Pawn(ChessPiece):
     numWhite = 0

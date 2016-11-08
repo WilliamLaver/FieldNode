@@ -12,7 +12,6 @@ class ChessBoard(object):
         self.pieces = []
         self.Initialize_Pieces(pieces)
         self.Populate_Board()
-        self.Draw_Board()
     
     def Initialize_Pieces(self, pieces):
         for key,val in pieces.iteritems():
@@ -30,23 +29,33 @@ class ChessBoard(object):
                 location = string.ascii_uppercase[j]+str(i+1)
                 piece = self.Find_Piece_At_Location(location)
                 if piece == None:
-                    self.board_mapping[location] = '# '
+                    if (i + j) % 2 == 0:
+                        self.board_mapping[location] = u'\u25A1 '#'\u20E3'
+                    else:
+                        self.board_mapping[location] = u'\u25A0 '
                 else:
-                    self.board_mapping[location] = piece.symbol
+                    self.board_mapping[location] = piece
         
         
     def Draw_Board(self):
         for i in range(9):
             for j in range(9):
                 if i == 0 and j == 0:
-                    sys.stdout.write('  ')
+                    sys.stdout.write('    ')
                 elif j == 0:
-                    sys.stdout.write(string.ascii_uppercase[8-i]+" ")
+                    sys.stdout.write(string.ascii_uppercase[8-i]+"  ")
                 elif i == 0:
                     sys.stdout.write(str(j)+ " ")
+                    if j == 4 or j == 6:
+                        sys.stdout.write(" ")
                 else:
                     location = string.ascii_uppercase[8-i]+str(j)
-                    sys.stdout.write(self.board_mapping[location])
+                    piece = self.board_mapping[location]
+                    if isinstance(piece, ChessPiece):
+                        sys.stdout.write(piece.symbol)
+                    else:
+                        sys.stdout.write(piece)
+                    
             sys.stdout.write('\n')
             
     def Find_Piece_At_Location(self, location):
@@ -59,4 +68,8 @@ class ChessBoard(object):
         
 if __name__ == '__main__':
     board = ChessBoard()
+    board.board_mapping['C2'].move('C4')
+    board.board_mapping['E1'].move('E5')
+    board.Populate_Board()
+    board.Draw_Board()
    
