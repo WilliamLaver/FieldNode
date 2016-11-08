@@ -2,7 +2,6 @@
 from ChessBoard import ChessBoard
 from ChessPiece import *
 import os
-import sys
 import re
 
 class Chess(object):
@@ -102,7 +101,6 @@ class Chess(object):
             if piece2.get_colour() == self.player[1]:
                 return False
             else:
-                self.display_msg = "Switching with game-piece"
                 if piece2.get_type() == 'king':
                     self.game_over = True
                     self.display_msg = "Game Over!"
