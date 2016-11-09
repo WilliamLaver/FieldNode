@@ -159,7 +159,32 @@ class Chess(object):
                 for loc in path:
                     if isinstance(self.board.board_mapping[loc],ChessPiece):
                         path_clear = False
+                        
+            elif abs(self.char_map[destination[0]] - self.char_map[pos[0]]) == abs(int(destination[1]) - int(pos[1])):
+                num_start = int(pos[1])
+                num_end = int(destination[1])
+                char_start = self.char_map[pos[0]]
+                char_end = self.char_map[destination[0]]
+                
+                if num_start < num_end:
+                    num_path = range(num_start + 1, num_end)
+                else:
+                    num_path = range(num_end + 1, num_start)
+                    num_path.reverse()
+                
+                if char_start < char_end:
+                    char_path = range(char_start + 1, char_end)
+                else:
+                    char_path = range(char_end + 1, char_start)
+                    char_path.reverse()
                     
+                for i in range(len(num_path)):
+                    path = [string.ascii_uppercase[char_path[i] - 1] + str(num_path[i]) for i in range(len(num_path))]
+                
+                for loc in path:
+                    if isinstance(self.board.board_mapping[loc],ChessPiece):
+                        path_clear = False
+                        
         return path_clear
                 
     #prompt user to play again, otherwise end program
