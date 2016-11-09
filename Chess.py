@@ -70,13 +70,25 @@ class Chess(object):
                 
                 piece = self.board.board_mapping[pos[0]]
                 
+                #proceed if chess piece at chosen location
                 if isinstance(piece,ChessPiece):
+                    
+                    #proceed if not moving other player's piece
                     if piece.get_colour() == self.player[1]:
+                        
+                        #check the status of the move destination
                         destination_clear = self.Check_Destination(piece, pos[1])
                         if not destination_clear:
                             self.display_msg = "ERROR: " + pos[1] + " already occupied."
                             continue
-                        self.Check_Path(piece, pos[1])
+                        
+                        #check if the path is clear
+                        path_clear = self.Check_Path(piece, pos[1])
+                        if not path_clear:
+                            self.display_msg = "ERROR: Path from " + pos[0] + " to " + pos[1] + " not clear."
+                            break
+                        
+                        #attempt to move the piece based on it's legal moves
                         success = piece.move(pos[1])
                         if success == 0:
                             self.display_msg = "ERROR: A " + piece.get_type() + " cannot perform this move."
@@ -116,12 +128,28 @@ class Chess(object):
         else:
             return True
             
-    def Check_Path(piece, destination):
-        if piece.get_type() == 'knight':
-            return 1
-        else:
+    def Check_Path(self, piece, destination):
+        path_clear = True
+        if piece.get_type() != 'knight':
             pos = [char for char in piece.location]
-            if pos[0] == destination[0]:
+            if pos[1] == destination[1]:
+                start = self.char_map[pos[0]]
+                end = self.char_map[destination[0]]
+                print start, end
+                if start < end:
+                    path = range(start + 1, end)
+                else:
+                    path = range(end + 1, start)
+                    path.reverse()
+                print path
+                path = [string.ascii_uppercase[char - 1] + pos[1] for char in path]
+                print path
+                for loc in path:
+                    if isinstance(self.board.board_mapping[loc],ChessPiece):
+                        path_clear = False
+            
+                    
+            return path_clear
                 
     #prompt user to play again, otherwise end program
     def End_Game(self):
