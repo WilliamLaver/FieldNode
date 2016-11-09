@@ -86,7 +86,7 @@ class Chess(object):
                         path_clear = self.Check_Path(piece, pos[1])
                         if not path_clear:
                             self.display_msg = "ERROR: Path from " + pos[0] + " to " + pos[1] + " not clear."
-                            break
+                            continue
                         
                         #attempt to move the piece based on it's legal moves
                         success = piece.move(pos[1])
@@ -135,21 +135,32 @@ class Chess(object):
             if pos[1] == destination[1]:
                 start = self.char_map[pos[0]]
                 end = self.char_map[destination[0]]
-                print start, end
+                if start < end:
+                    path = range(start + 1, end)
+                else:
+                    path = range(end + 1, start)
+                    path.reverse()
+                path = [string.ascii_uppercase[char - 1] + pos[1] for char in path]
+                for loc in path:
+                    if isinstance(self.board.board_mapping[loc],ChessPiece):
+                        path_clear = False
+                        
+            elif pos[0] == destination[0]:
+                start = int(pos[1])
+                end = int(destination[1])
                 if start < end:
                     path = range(start + 1, end)
                 else:
                     path = range(end + 1, start)
                     path.reverse()
                 print path
-                path = [string.ascii_uppercase[char - 1] + pos[1] for char in path]
+                path = [pos[0] + str(num) for num in path]
                 print path
                 for loc in path:
                     if isinstance(self.board.board_mapping[loc],ChessPiece):
                         path_clear = False
-            
                     
-            return path_clear
+        return path_clear
                 
     #prompt user to play again, otherwise end program
     def End_Game(self):
