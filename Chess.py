@@ -9,6 +9,7 @@ class Chess(object):
     def __init__(self):
         self.purpose = "I am a chess game object."
         self.player = [1,'white']
+        self.char_map = {'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8}
         self.game_over = False
         os.system('cls')
         print "Welcome to Interactive Chess!"
@@ -49,6 +50,7 @@ class Chess(object):
             response = raw_input("\nPlayer "+ str(self.player[0]) + " --> ")
             if response == 'quit':
                 play_flag = False
+                continue
             elif response == "":
                 self.display_msg = "ERROR: enter move is 'c2>c4' format only."
                 continue
@@ -74,7 +76,11 @@ class Chess(object):
                         if not destination_clear:
                             self.display_msg = "ERROR: " + pos[1] + " already occupied."
                             continue
-                        piece.move(pos[1])
+                        self.Check_Path(piece, pos[1])
+                        success = piece.move(pos[1])
+                        if success == 0:
+                            self.display_msg = "ERROR: A " + piece.get_type() + " cannot perform this move."
+                            continue
                     else:
                         self.display_msg = "ERROR: Cannot move other player's piece!"
                         continue
@@ -86,7 +92,8 @@ class Chess(object):
             self.Switch_Player()
             
         self.End_Game()
-        
+    
+    #Switch to the next player's turn
     def Switch_Player(self):
         if self.player[0] == 1:
             self.player = [2, 'black']
@@ -108,7 +115,14 @@ class Chess(object):
                 return True
         else:
             return True
-    
+            
+    def Check_Path(piece, destination):
+        if piece.get_type() == 'knight':
+            return 1
+        else:
+            pos = [char for char in piece.location]
+            if pos[0] == destination[0]:
+                
     #prompt user to play again, otherwise end program
     def End_Game(self):
         response = raw_input('Press Any Key To Continue')
