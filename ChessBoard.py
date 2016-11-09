@@ -9,7 +9,7 @@ class ChessBoard(object):
         pieces = {"King":1, "Queen":1, "Rook":2, "Bishop":2, "Knight":2, "Pawn":8}
         
         #board's pieces attribute should be a list of all pieces
-        self.pieces = []
+        self.pieces = [[] for i in range(2)]
         self.captured_pieces = [[] for i in range(2)]   #1st array is white pieces, 2nd is black
         self.Initialize_Pieces(pieces)
         self.Populate_Board()
@@ -19,8 +19,8 @@ class ChessBoard(object):
             for i in range(val):
                 exec("white_piece = " + str(key) + "('white')")
                 exec("black_piece = " + str(key) + "('black')")
-                self.pieces.append(white_piece)
-                self.pieces.append(black_piece)
+                self.pieces[0].append(white_piece)
+                self.pieces[1].append(black_piece)
                 
     
     def Populate_Board(self):
@@ -71,7 +71,10 @@ class ChessBoard(object):
             
     def Find_Piece_At_Location(self, location):
         chess_piece = None
-        for piece in self.pieces:
+        for piece in self.pieces[0]:
+            if piece.location == location:
+                chess_piece = piece
+        for piece in self.pieces[1]:
             if piece.location == location:
                 chess_piece = piece
         

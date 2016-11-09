@@ -3,6 +3,7 @@ from ChessBoard import ChessBoard
 from ChessPiece import *
 import os
 import re
+import random
 
 class Chess(object):
     
@@ -11,15 +12,21 @@ class Chess(object):
         self.player = [1,'white']
         self.char_map = {'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8}
         self.game_over = False
+        self.computer_on = False
         os.system('cls')
         print "Welcome to Interactive Chess!"
         print "Start Game [yes/y]"
+        print "Play Computer [ai]"
         print "Quit Program [quit/q]"
         response_flag = False
         while(response_flag == False):
             response = raw_input().lower()
             if(response == "yes" or response == "y"):
                 response_flag = True
+                self.Play_Game()
+            elif(response == "ai"):
+                response_flag = True
+                self.computer_on = True
                 self.Play_Game()
             elif(response == "quit" or response == "q"):
                 response_flag = True
@@ -47,6 +54,19 @@ class Chess(object):
                 print "Player %d Wins!!!"%(self.player[0])
                 break
             
+            if self.computer_on and self.player[0] == 2:
+                rand_piece = self.board.pieces[1][random.randint(0,len(self.board.pieces[1])-1)]
+                clear = False
+                while not clear:
+                    rand_dest = rand_piece.potential_moves[random.randint(0,len(rand_piece.potential_moves)-1)]
+                    rand_destination_clear = self.Check_Destination(rand_piece,rand_dest)
+                    rand_path_clear = self.Check_Path(rand_piece, rand_dest)
+                    clear = rand_destination_clear and rand_path_clear
+                
+                rand_piece.move(rand_dest)
+                self.Switch_Player()
+                continue
+                    
             response = raw_input("\nPlayer "+ str(self.player[0]) + " --> ")
             if response == 'quit':
                 play_flag = False
@@ -79,7 +99,7 @@ class Chess(object):
                         #check the status of the move destination
                         destination_clear = self.Check_Destination(piece, pos[1])
                         if not destination_clear:
-                            self.display_msg = "ERROR: " + pos[1] + " already occupied."
+                            self.display_msg = "ERROR: Cannot move piece to " + pos[1]
                             continue
                         
                         #check if the path is clear
@@ -120,16 +140,32 @@ class Chess(object):
             if piece2.get_colour() == self.player[1]:
                 return False
             else:
+                
+                if piece1.get_type() == 'pawn':
+                    if piece1.location[0] == destination[0]:
+                        return False
+                        
                 if piece2.get_type() == 'king':
                     self.game_over = True
                     self.display_msg = "Game Over!"
+                    
                 piece2.location = None
                 if piece2.get_colour() == 'white':
                     self.board.captured_pieces[0].append(piece2)
+                    self.board.pieces[0] = self.board.pieces[0][0:self.board.pieces[0].index(piece2)]+self.board.pieces[0][self.board.pieces[0].index(piece2)+1:]
                 else:
                     self.board.captured_pieces[1].append(piece2)
+                    self.board.pieces[1] = self.board.pieces[1][0:self.board.pieces[1].index(piece2)]+self.board.pieces[1][self.board.pieces[1].index(piece2)+1:]
                 return True
         else:
+            
+            if piece1.get_type() == 'pawn':
+                loc_num = self.char_map[piece1.location[0]]
+                dest_num = self.char_map[destination[0]]               
+                
+                if abs(dest_num - loc_num) == abs(int(destination[1]) - int(piece1.location[1])):
+                    return False
+                    
             return True
             
     def Check_Path(self, piece, destination):
@@ -182,8 +218,7 @@ class Chess(object):
                     char_path = range(char_end + 1, char_start)
                     char_path.reverse()
                     
-                for i in range(len(num_path)):
-                    path = [string.ascii_uppercase[char_path[i] - 1] + str(num_path[i]) for i in range(len(num_path))]
+                path = [string.ascii_uppercase[char_path[i] - 1] + str(num_path[i]) for i in range(len(num_path))]
                 
                 for loc in path:
                     if isinstance(self.board.board_mapping[loc],ChessPiece):
