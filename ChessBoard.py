@@ -10,6 +10,7 @@ class ChessBoard(object):
         
         #board's pieces attribute should be a list of all pieces
         self.pieces = []
+        self.captured_pieces = [[] for i in range(2)]   #1st array is white pieces, 2nd is black
         self.Initialize_Pieces(pieces)
         self.Populate_Board()
     
@@ -57,6 +58,16 @@ class ChessBoard(object):
                         sys.stdout.write(piece)
                     
             sys.stdout.write('\n')
+            
+        sys.stdout.write('\n')
+        for item in self.captured_pieces[0]:
+            sys.stdout.write(item.symbol) 
+        sys.stdout.write('\n')
+        for item in self.captured_pieces[1]:
+            sys.stdout.write(item.symbol) 
+        sys.stdout.write('\n')
+            
+                
             
     def Find_Piece_At_Location(self, location):
         chess_piece = None

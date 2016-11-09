@@ -124,6 +124,10 @@ class Chess(object):
                     self.game_over = True
                     self.display_msg = "Game Over!"
                 piece2.location = None
+                if piece2.get_colour() == 'white':
+                    self.board.captured_pieces[0].append(piece2)
+                else:
+                    self.board.captured_pieces[1].append(piece2)
                 return True
         else:
             return True
