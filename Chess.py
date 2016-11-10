@@ -14,11 +14,18 @@ class Chess(object):
         self.char_map = {'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8}
         self.game_over = False
         self.computer_on = False
-        os.system('cls')
+        
+        #clear the screen
+        if sys.platform == 'win32' or sys.platform == 'win64':
+            os.system('cls')  
+        else:
+            os.system('clear')
+            
         print "Welcome to Interactive Chess!"
         print "Start Game [yes/y]"
         print "Play Computer [ai]"
         print "Quit Program [quit/q]"
+        
         response_flag = False
         while(response_flag == False):
             response = raw_input().lower()
@@ -43,13 +50,20 @@ class Chess(object):
         
         #game-play loop
         while(play_flag):
-            os.system('cls')                    #clear the screen
             
-            if self.computer_on:                #print the AI's latest move
+            #clear the screen
+            if sys.platform == 'win32' or sys.platform == 'win64':
+                os.system('cls')  
+            else:
+                os.system('clear')                  
+            
+            #print the AI's latest move
+            if self.computer_on:                
                 print "   ",self.ai_msg
             
+            #display any potential error message
             print self.display_msg
-            if self.display_msg != "":          #display any potential error message
+            if self.display_msg != "":          
                 self.display_msg = ""
             self.board.Populate_Board()         
             self.board.Draw_Board()

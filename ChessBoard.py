@@ -45,20 +45,34 @@ class ChessBoard(object):
         for i in range(9):
             for j in range(9):
                 if i == 0 and j == 0:
-                    sys.stdout.write('     ')
+                    if sys.platform == 'win32' or sys.platform == 'win64':
+                        sys.stdout.write('     ')
+                    else:
+                        sys.stdout.write('   ')
                 elif j == 0:
-                    sys.stdout.write(string.ascii_uppercase[8-i]+"   ")
+                    if sys.platform == 'win32' or sys.platform == 'win64':
+                        sys.stdout.write(string.ascii_uppercase[8-i]+"   ")
+                    else:
+                        sys.stdout.write(string.ascii_uppercase[8-i]+"  ")
                 elif i == 0:
-                    sys.stdout.write(str(j)+ "   ")
-                    if j == 4 or j == 6:
-                       sys.stdout.write(" ")
+                    if sys.platform == 'win32' or sys.platform == 'win64':
+                        sys.stdout.write(str(j)+ "   ")
+                        if j == 4 or j == 6:
+                            sys.stdout.write(" ")
+                    else:
+                        sys.stdout.write(str(j)+ "  ")
+                        
+                    
                 else:
                     location = string.ascii_uppercase[8-i]+str(j)
                     piece = self.board_mapping[location]
                     if isinstance(piece, ChessPiece):
                         sys.stdout.write(piece.symbol + '  ')
                     else:
-                        sys.stdout.write(piece + '  ')
+                        if sys.platform == 'win32' or sys.platform == 'win64':
+                            sys.stdout.write(piece + '  ')
+                        else:
+                            sys.stdout.write(piece + ' ')
             sys.stdout.write('\n')
             sys.stdout.write('\n')
             
