@@ -2,6 +2,7 @@
 from ChessBoard import ChessBoard
 from ChessPiece import *
 import os
+import sys
 import re
 import random
 
@@ -37,11 +38,16 @@ class Chess(object):
     def Play_Game(self):
         play_flag = True
         self.board =  ChessBoard()
-        self.display_msg = ""
+        self.display_msg = "To move a piece from E2 to E4 type 'e2>e4'"
+        self.ai_msg = ""
         
         #game-play loop
         while(play_flag):
             os.system('cls')                    #clear the screen
+            
+            if self.computer_on:                #print the AI's latest move
+                print "   ",self.ai_msg
+            
             print self.display_msg
             if self.display_msg != "":          #display any potential error message
                 self.display_msg = ""
@@ -57,17 +63,30 @@ class Chess(object):
             if self.computer_on and self.player[0] == 2:
                 rand_piece = self.board.pieces[1][random.randint(0,len(self.board.pieces[1])-1)]
                 clear = False
+                n = 0
                 while not clear:
+                    
+                    if n >= len(rand_piece.potential_moves):
+                        rand_piece = self.board.pieces[1][random.randint(0,len(self.board.pieces[1])-1)]
+                        n = 0
+                    
                     rand_dest = rand_piece.potential_moves[random.randint(0,len(rand_piece.potential_moves)-1)]
                     rand_destination_clear = self.Check_Destination(rand_piece,rand_dest)
                     rand_path_clear = self.Check_Path(rand_piece, rand_dest)
                     clear = rand_destination_clear and rand_path_clear
+                    n += 1   
+                                         
                 
+                #remove the opposing piece
+                if isinstance(self.board.board_mapping[rand_dest],ChessPiece):
+                    self.Remove_Piece(rand_dest)
+                #move the piece
+                self.ai_msg = "AI moved " + rand_piece.__str__() + " to " + rand_dest
                 rand_piece.move(rand_dest)
                 self.Switch_Player()
                 continue
                     
-            response = raw_input("\nPlayer "+ str(self.player[0]) + " --> ")
+            response = raw_input("Player "+ str(self.player[0]) + " --> ")
             if response == 'quit':
                 play_flag = False
                 continue
@@ -110,9 +129,15 @@ class Chess(object):
                         
                         #attempt to move the piece based on it's legal moves
                         success = piece.move(pos[1])
+                        
                         if success == 0:
                             self.display_msg = "ERROR: A " + piece.get_type() + " cannot perform this move."
                             continue
+                        
+                        #remove the opposing piece
+                        if isinstance(self.board.board_mapping[pos[1]],ChessPiece):
+                            self.Remove_Piece(pos[1])
+                        
                     else:
                         self.display_msg = "ERROR: Cannot move other player's piece!"
                         continue
@@ -147,15 +172,9 @@ class Chess(object):
                         
                 if piece2.get_type() == 'king':
                     self.game_over = True
-                    self.display_msg = "Game Over!"
+                    self.display_msg = "              Game Over!"
+                    self.ai_msg = ""
                     
-                piece2.location = None
-                if piece2.get_colour() == 'white':
-                    self.board.captured_pieces[0].append(piece2)
-                    self.board.pieces[0] = self.board.pieces[0][0:self.board.pieces[0].index(piece2)]+self.board.pieces[0][self.board.pieces[0].index(piece2)+1:]
-                else:
-                    self.board.captured_pieces[1].append(piece2)
-                    self.board.pieces[1] = self.board.pieces[1][0:self.board.pieces[1].index(piece2)]+self.board.pieces[1][self.board.pieces[1].index(piece2)+1:]
                 return True
         else:
             
@@ -170,8 +189,11 @@ class Chess(object):
             
     def Check_Path(self, piece, destination):
         path_clear = True
+        
         if piece.get_type() != 'knight':
+            
             pos = [char for char in piece.location]
+            #if move is in same column
             if pos[1] == destination[1]:
                 start = self.char_map[pos[0]]
                 end = self.char_map[destination[0]]
@@ -180,11 +202,14 @@ class Chess(object):
                 else:
                     path = range(end + 1, start)
                     path.reverse()
+                    
                 path = [string.ascii_uppercase[char - 1] + pos[1] for char in path]
+                
                 for loc in path:
                     if isinstance(self.board.board_mapping[loc],ChessPiece):
                         path_clear = False
-                        
+            
+            #if move is in same row
             elif pos[0] == destination[0]:
                 start = int(pos[1])
                 end = int(destination[1])
@@ -193,13 +218,14 @@ class Chess(object):
                 else:
                     path = range(end + 1, start)
                     path.reverse()
-                print path
+                    
                 path = [pos[0] + str(num) for num in path]
-                print path
+                
                 for loc in path:
                     if isinstance(self.board.board_mapping[loc],ChessPiece):
                         path_clear = False
-                        
+            
+            #if move is along a diagonal
             elif abs(self.char_map[destination[0]] - self.char_map[pos[0]]) == abs(int(destination[1]) - int(pos[1])):
                 num_start = int(pos[1])
                 num_end = int(destination[1])
@@ -225,11 +251,21 @@ class Chess(object):
                         path_clear = False
                         
         return path_clear
-                
+        
+    def Remove_Piece(self, location):
+        piece = self.board.board_mapping[location]
+        piece.location = None
+        if piece.get_colour() == 'white':
+            self.board.captured_pieces[0].append(piece)
+            self.board.pieces[0] = self.board.pieces[0][0:self.board.pieces[0].index(piece)]+self.board.pieces[0][self.board.pieces[0].index(piece)+1:]
+        else:
+            self.board.captured_pieces[1].append(piece)
+            self.board.pieces[1] = self.board.pieces[1][0:self.board.pieces[1].index(piece)]+self.board.pieces[1][self.board.pieces[1].index(piece)+1:]
+        
     #prompt user to play again, otherwise end program
     def End_Game(self):
-        response = raw_input('Press Any Key To Continue')
-        myChess = Chess()            
+        response = raw_input('Press Any Key To Continue\n')
+        self.__init__()           
         
     def Exit_Program(self):
         print "Exiting the program"

@@ -295,9 +295,10 @@ class Bishop(ChessPiece):
     
 if __name__ == '__main__':
     my_piece = ChessPiece("black")
-    queen = Queen('black')
-    queen.move('F5')
-    print queen.potential_moves
+    knight = Knight('black')
+    knight.move('B8')
+    print knight.potential_moves
+    print knight.__str__()
     
     
    
