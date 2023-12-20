@@ -38,6 +38,7 @@ class Node(object):
         self.neigbours = np.array([None, None, None, None])
         self.g = 0
 
+    # inacted when an impulse "crosses" the node
     def pulse(self):
         self.g = self.f(self.g)
         self.update_weights()
