@@ -8,6 +8,7 @@ Created on Tue Dec 19 17:07:14 2023
 import numpy as np
 import pandas as pd
 
+
 # Need something that makes already visited nodes easier to access
 # How to make each touch of the node grease the path to it?
 
@@ -20,9 +21,35 @@ class Field(object):
         self.field = pd.DataFrame()
         iVec = np.array([1, 0, 1, 1, 1])
         origin = Node(1, iVec, 0)
+        Impulse(0, origin, cl=1)
+
+    def display_node_vals(self):
+        # For each node in the field, display the value. Result should be 
+        # visually rendered at the very least in 2D.
+        pass
 
 
 class Node(object):
+
+    def __init__(self):
+        # neighbours is the collection of weights assigned to surrounding
+        # Nodes, these weights should increment each time the path is taken:
+        # effectively greasing the most active pathways
+        self.neigbours = np.array([None, None, None, None])
+        self.g = 0
+
+    def pulse(self):
+        self.g = self.f(self.g)
+        self.update_weights()
+
+    def update_weights(self):
+        # before moving the pulse to the next node, "grease the pathways" by
+        # incrementing the weights by both the size of the impulse and the
+        # amount that the path is already "greasy". The weights should be a 
+        # four value array (N/E/S/W in 2D)
+        pass
+
+class Impulse(object):
 
     # G is the new value at the vector as a function of the old
     # nVec is the vector with which the future node will be created
